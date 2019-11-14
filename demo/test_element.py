@@ -2,7 +2,12 @@ from time import sleep
 
 import autoit
 from selenium.webdriver import ActionChains#导入类
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC  # 定义了变量EC表示expected_conditions
+
+
 
 
 def test_input(driver):#纯输入框，输入内容
@@ -112,7 +117,7 @@ def test_alert(driver):
 
 
 
-def test_windows(driver):
+def test_windows(driver):   #定义方法名test开头(调用公用包方法)
     driver.get("http://192.168.1.128:8082/xuepl/demo.html")
     sleep(2)
 
@@ -129,11 +134,44 @@ def test_windows(driver):
     actions.key_down(Keys.CONTROL).click(dn).key_up(Keys.CONTROL).perform()
     sleep(2)
 
-    # 获取所有窗口的句柄
-    handles = driver.window_handles
-    for h in handles:
-        # 根据窗口句柄，切换窗口
-        driver.switch_to.window(h)
+
+    handles = driver.window_handles         # 获取所有窗口的句柄
+    for h in handles:           #循环 h变量
+
+        driver.switch_to.window(h)      # 根据窗口句柄，切换窗口
         sleep(2)
-        if driver.title.__contains__("京东"):
-            break
+        if driver.title.__contains__("京东"):      #判断是否在京东页面
+            break                                        #关闭
+
+
+def test_from(driver):
+    driver.get("http://192.168.1.128:8082/xuepl1/frame/main.html")
+    sleep(2)
+
+    frame=driver.find_element_by_xpath('/html/frameset/frameset/frame[1]')
+    driver.switch_to.frame(frame)
+    sleep(2)
+    driver.find_element_by_partial_link_text('京东').click()
+    sleep(2)
+
+
+    driver.switch_to.parent_frame()     #退出当前ifame
+    sleep(2)
+    iframe=driver.find_element_by_xpath('/html/frameset/frameset/frame[2]') #进入frome
+    driver.switch_to.frame(iframe)  #切换frame
+    sleep(2)                        #响应时间
+    inpu=driver.find_element_by_xpath('//*[@id="key"]')     #定位输入框
+    inpu.clear()              #清空
+    inpu.send_keys('手机')                                #输入内容
+    sleep(2)
+
+def test_wher(driver):
+    driver.get("http://ui.yansl.com/#/loading")                #打开网址
+    bt=driver.find_element_by_xpath("//button/span[contains(text(),'指令方式')]")   #驱动查找元素路径
+    bt.click()
+    WebDriverWait(driver, 5, 0.5).until(
+        EC.presence_of_element_located((By.XPATH, '//tbody/tr[2]/td[2]/div[text()="王小虎"]'))
+    )   #
+    bg=driver.find_element_by_xpath("//tbody/tr[2]/td[2]/div[text()='王小虎']")#驱动查找元素路径
+    print(bg.text)      #打印文本
+    sleep(2)
